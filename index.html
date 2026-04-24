@@ -136,21 +136,20 @@
     <div id="game-content" class="hidden">
         <h1 id="mensaje">¡Acércate al micro y sopla fuerte!</h1>
         
-        <div class="cake-container">
-            <div class="cake">
-                <div class="plate"></div>
-                <div class="layer layer-bottom"></div>
-                <div class="layer layer-middle"></div>
-                <div class="layer layer-top"></div>
-                <div class="icing"></div>
-            </div>
+    <div class="cake-container">
+    <div class="cake">
+        <div class="plate"></div>
+        <div class="layer layer-bottom"></div>
+        <div class="layer layer-middle"></div>
+        <div class="layer layer-top"></div>
+        <div class="icing"></div>
 
-            <div class="candle">
-                <div class="flame" id="flame"></div>
-                <div class="wax"></div>
-            </div>
+        <div class="candle">
+            <div class="flame" id="flame"></div>
+            <div class="wax"></div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -190,7 +189,7 @@
                     let average = sum / bufferLength;
 
                     // Umbral de sensibilidad (ajústalo si es necesario)
-                    if (average > 50) { 
+                    if (average > 15) { 
                         extinguish();
                     } else {
                         requestAnimationFrame(detectBlow);
