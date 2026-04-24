@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Feliz Cumpleaños!</title>
+    <title>¡Feliz Cumpleaños Andrea!</title>
     <style>
         :root {
             --cake-color: #f191ba;
@@ -13,7 +13,10 @@
         }
 
         body {
-            background-color: #222;
+            /* Aquí está la imagen de fondo. Puedes cambiar la URL por otra o por un archivo local si quieres */
+            background: #222 url('https://w0.peakpx.com/wallpaper/434/405/HD-wallpaper-birthday-background-with-balloons-gifts-and-confetti-blue-party-background-birthday-party-concepts.jpg') no-repeat center center fixed;
+            background-size: cover;
+            
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -29,12 +32,22 @@
             margin-bottom: 50px;
             text-align: center;
             transition: all 0.5s ease;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8); /* Sombra para que siempre se lea bien */
+            animation: parpadeo 1.5s infinite; /* Animación de parpadeo */
+        }
+
+        /* Esta es la animación de parpadeo */
+        @keyframes parpadeo {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
 
         /* Contenedor del Pastel */
         .cake-container {
             position: relative;
             cursor: pointer;
+            z-index: 5;
         }
 
         .cake {
@@ -73,7 +86,7 @@
             z-index: 2;
         }
 
-        /* Vela */
+        /* Vela (Ahora centrada correctamente) */
         .candle {
             position: absolute;
             top: -45px;
@@ -136,20 +149,21 @@
     <div id="game-content" class="hidden">
         <h1 id="mensaje">¡Acércate al micro y sopla fuerte!</h1>
         
-    <div class="cake-container">
-    <div class="cake">
-        <div class="plate"></div>
-        <div class="layer layer-bottom"></div>
-        <div class="layer layer-middle"></div>
-        <div class="layer layer-top"></div>
-        <div class="icing"></div>
+        <div class="cake-container">
+            <div class="cake">
+                <div class="plate"></div>
+                <div class="layer layer-bottom"></div>
+                <div class="layer layer-middle"></div>
+                <div class="layer layer-top"></div>
+                <div class="icing"></div>
 
-        <div class="candle">
-            <div class="flame" id="flame"></div>
-            <div class="wax"></div>
+                <div class="candle">
+                    <div class="flame" id="flame"></div>
+                    <div class="wax"></div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -158,17 +172,39 @@
         const gameContent = document.getElementById('game-content');
         const flame = document.getElementById('flame');
         const mensaje = document.getElementById('mensaje');
+        let audioContext;
+        let lluviaConfetiInterval;
 
         startBtn.addEventListener('click', () => {
             startBtn.classList.add('hidden');
             gameContent.classList.remove('hidden');
+            
+            // Iniciar el confeti continuo de fondo
+            iniciarConfetiContinuo();
+            
+            // Iniciar micrófono
             initAudio();
         });
+
+        // Función para que caiga confeti siempre desde arriba
+        function iniciarConfetiContinuo() {
+            lluviaConfetiInterval = setInterval(() => {
+                confetti({
+                    particleCount: 5,
+                    angle: 90,
+                    spread: 100,
+                    origin: { y: -0.1, x: Math.random() }, // Cae desde arriba en posiciones aleatorias
+                    ticks: 300,
+                    gravity: 0.6,
+                    zIndex: 0 // Atrás del pastel
+                });
+            }, 250);
+        }
 
         async function initAudio() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const audioContext = new AudioContext();
+                audioContext = new AudioContext();
                 const analyzer = audioContext.createAnalyser();
                 const microphone = audioContext.createMediaStreamSource(stream);
                 
@@ -181,15 +217,14 @@
                 function detectBlow() {
                     analyzer.getByteFrequencyData(dataArray);
                     
-                    // Calculamos el volumen promedio
                     let sum = 0;
                     for (let i = 0; i < bufferLength; i++) {
                         sum += dataArray[i];
                     }
                     let average = sum / bufferLength;
 
-                    // Umbral de sensibilidad (ajústalo si es necesario)
-                    if (average > 15) { 
+                    // Umbral ajustado a 15 para que sea sensible
+                    if (average > 50) { 
                         extinguish();
                     } else {
                         requestAnimationFrame(detectBlow);
@@ -204,17 +239,39 @@
         }
 
         function extinguish() {
+            // Apagar la vela
             flame.classList.add('off');
-            mensaje.innerText = "¡FELIZ CUMPLEAÑOS! 🎉";
-            mensaje.style.color = "#ff477e";
+            
+            // Cambiar el mensaje para Andrea
+            mensaje.innerText = "¡FELIZ CUMPLEAÑOS ANDREA! 🎉 TE QUIERO MUCHO";
+            mensaje.style.color = "#c153fc"; // Letras doradas/amarillas para resaltar
             mensaje.style.fontSize = "3rem";
             
-            // Efecto de confeti
+            // Hacer que el parpadeo sea un poco más rápido por la emoción
+            mensaje.style.animation = "parpadeo 0.8s infinite"; 
+            
+            // Apagar el micrófono para ahorrar recursos
+            if (audioContext) {
+                audioContext.close();
+            }
+            
+            // Gran explosión de confeti desde el pastel
             confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 }
+                particleCount: 250,
+                spread: 120,
+                origin: { y: 0.6 },
+                zIndex: 10 // Al frente de todo
             });
+            
+            // Otra explosión un segundo después
+            setTimeout(() => {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.5 },
+                    zIndex: 10
+                });
+            }, 500);
         }
     </script>
 </body>
